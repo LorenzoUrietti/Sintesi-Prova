@@ -20,6 +20,17 @@ button{ text-decoration: none; padding:10px 20px 10px 20px; border-radius: 30px;
   }
 }
 
+
+.mapboxgl-popup {
+  max-width: 200px;
+}
+
+.mapboxgl-popup-content {
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+}
+
+
 </style>
 </head>
 
@@ -39,11 +50,11 @@ button{ text-decoration: none; padding:10px 20px 10px 20px; border-radius: 30px;
 
 	mapboxgl.accessToken = 'pk.eyJ1Ijoia3ViYWJsYXN6Y3p5a293c2tpIiwiYSI6ImNrdjZxaGowbTJ6eWQzMXF3b3k2bHlraDgifQ.ww6jGZYsy5Vo12LGx8VTqA';
 
-    const map = new mapboxgl.Map({
+  const map = new mapboxgl.Map({
         container: 'map', // container ID
         style:'mapbox://styles/kubablaszczykowski/ckvh5rhim3qux14l246uaw4gr', // style URL
         center: [9.18, 45.449], // starting position [lng, lat]
-        zoom: 11, // starting zoom
+        zoom: 13, // starting zoom
         antialias: true,
 
     });
@@ -52,10 +63,10 @@ button{ text-decoration: none; padding:10px 20px 10px 20px; border-radius: 30px;
     // vecchio full screen
     // map.addControl(new mapboxgl.FullscreenControl(), );
 
-    // nuovo full screen
+// nuovo full screen
 
-  var elem = document.documentElement;
-  let stato =0;
+var elem = document.documentElement;
+let stato =0;
 
 function neoFullscreenUnico(){
     if(stato===0){
@@ -79,20 +90,15 @@ function neoFullscreenUnico(){
     }
 }
  
-
 // evento iniziale
 function intro(){
     map.flyTo({
       center: map.center,
-      zoom: 15.5,
+      zoom: 16,
       bearing: 0,
     // These options control the flight curve, making it move
     // slowly and zoom out almost completely before starting to pan.
-      speed: 0.9, // make the flying slow
-      curve: 1, // change the speed at which it zooms out
-    // This can be any easing function: it takes a number between
-    // 0 and 1 and returns another number between 0 and 1.
-      easing: (t) => t, 
+      speed: 0.3, // make the flying slow
     // this animation is considered essential with respect to prefers-reduced-motion
       essential: true
     });
@@ -105,13 +111,30 @@ function intro(){
     map.setMinPitch(40);
   
 
-//funzione frecce
   //a, b, c, ... sono le coordinate dei centri dei luoghi di interesse
-const a = [9.2, 45.41];
-const b = [9.14, 44.99];
-const c = [9.16, 45.49];
-let statop = 0;
 
+const marker_a = new mapboxgl.Marker()
+  .setLngLat([9.183, 45.448])
+  .addTo(map)
+  .setPopup(new mapboxgl.Popup().setHTML("<a target='blank' href='https://www.youtube.com/watch?v=hio-rQxx9Vg&ab_channel=AlessandroBarbero-LaStoriasiamoNoi'><h1>Hello World!</h1></a>"));
+
+const a = marker_a.getLngLat();
+
+const marker_b = new mapboxgl.Marker()
+  .setLngLat([9.179, 45.446])
+  .addTo(map)
+  .setPopup(new mapboxgl.Popup().setHTML("<a target='blank' href='https://www.youtube.com/watch?v=-9PpDzV454M&ab_channel=ChicanoBatmanVEVO'><h1>Hello World!</h1></a>"));
+const b = marker_b.getLngLat();
+
+const marker_c = new mapboxgl.Marker()
+  .setLngLat([9.181, 45.4494])
+  .addTo(map)
+  .setPopup(new mapboxgl.Popup().setHTML("<a target='blank' href='https://www.youtube.com/watch?v=MLMRHScRnhs&t=24s&ab_channel=ZoomA%21%E3%82%BA%E3%83%BC%E3%83%9E%21'><h1>Hello World!</h1></a>"));
+const c = marker_c.getLngLat();
+
+
+//funzione frecce
+let statop = 0;
 function movefw(){
   switch(statop){
     case 0:
@@ -119,7 +142,7 @@ function movefw(){
         center: a, 
         essential: true,
         speed:0.4,
-        zoom: 15.5,
+        zoom: 16.5,
       });
       statop++;
     break;
@@ -128,7 +151,7 @@ function movefw(){
         center: b, 
         essential: true,
         speed:0.4,
-        zoom: 15.5,
+        zoom: 16.5,
       });
       statop++;
     break;
@@ -137,7 +160,7 @@ function movefw(){
         center: c,
         essential: true,
         speed:0.4,
-        zoom: 15.5,
+        zoom: 16.5,
       })
       statop=0;
     break;
@@ -149,8 +172,6 @@ function movefw(){
       })
   }
 }
-
-
 function movebw(){
   switch(statop){
     case 0:
@@ -158,7 +179,7 @@ function movebw(){
         center: c, 
         essential: true,
         speed:0.4,
-        zoom: 15.5,
+        zoom: 16.5,
       });
       statop=2;
     break;
@@ -167,7 +188,7 @@ function movebw(){
         center: b, 
         essential: true,
         speed:0.4,
-        zoom: 15.5,
+        zoom: 16.5,
       });
       statop--;
     break;
@@ -176,7 +197,7 @@ function movebw(){
         center: a,
         essential: true,
         speed:0.4,
-        zoom: 15.5,
+        zoom: 16.5,
       })
       statop--;
     break;
@@ -188,10 +209,6 @@ function movebw(){
       })
   }
 }
-
-
-
-
 
 //preloader
 const loader= document.querySelector('.loader')
