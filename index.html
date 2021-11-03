@@ -29,8 +29,10 @@ button{ text-decoration: none; padding:10px 20px 10px 20px; border-radius: 30px;
 
 <body onload='intro()'>
     <h1 style='position:absolute; z-index:20; top:20px; left:50px; color: blue;'>PUNKISSIMO</h1>
-    <div id='footer' style='position: absolute; bottom:0%; width:100%; height:5vh; background-color: black; z-index:10'></div>
-    <button id='fs' onclick='neoFullscreenUnico()' style='position:absolute; bottom:20px; left:10px; z-index: 50; background-color: blue;'><p style='color:white'>FUllscreen</p></button>
+    <div id='footer' style='position: absolute; bottom:0%; width:100%; height:8vh; background-color: black; z-index:10'></div>
+    <button id='fs' onclick='neoFullscreenUnico()' style='position:absolute; bottom:20px; left:10px; z-index: 50; background-color: blue; color: white'>FUllscreen</button>
+    <button id='fw' onclick='movefw()' style='position:absolute; z-index:20; bottom:20px; right:50px; background-color: blue; color:white'>	&#8594</button>
+    <button id='bw' onclick='movebw()'style='position:absolute; z-index:20; bottom:20px; right:110px; background-color: blue; color:white'>	&#8592</button>
 <div id="map"></div>
 <script>
 
@@ -102,6 +104,94 @@ function intro(){
     map.setMaxPitch(40);
     map.setMinPitch(40);
   
+
+//funzione frecce
+  //a, b, c, ... sono le coordinate dei centri dei luoghi di interesse
+const a = [9.2, 45.41];
+const b = [9.14, 44.99];
+const c = [9.16, 45.49];
+let statop = 0;
+
+function movefw(){
+  switch(statop){
+    case 0:
+      map.flyTo({
+        center: a, 
+        essential: true,
+        speed:0.4,
+        zoom: 15.5,
+      });
+      statop++;
+    break;
+    case 1:
+      map.flyTo({
+        center: b, 
+        essential: true,
+        speed:0.4,
+        zoom: 15.5,
+      });
+      statop++;
+    break;
+    case 2:
+      map.flyTo({
+        center: c,
+        essential: true,
+        speed:0.4,
+        zoom: 15.5,
+      })
+      statop=0;
+    break;
+    default:
+      map.flyTo({
+        center:map.center,
+        zoom: 15.5,
+        essential: true,
+      })
+  }
+}
+
+
+function movebw(){
+  switch(statop){
+    case 0:
+      map.flyTo({
+        center: c, 
+        essential: true,
+        speed:0.4,
+        zoom: 15.5,
+      });
+      statop=2;
+    break;
+    case 2:
+      map.flyTo({
+        center: b, 
+        essential: true,
+        speed:0.4,
+        zoom: 15.5,
+      });
+      statop--;
+    break;
+    case 1:
+      map.flyTo({
+        center: a,
+        essential: true,
+        speed:0.4,
+        zoom: 15.5,
+      })
+      statop--;
+    break;
+    default:
+      map.flyTo({
+        center:map.center,
+        zoom: 15.5,
+        essential: true,
+      })
+  }
+}
+
+
+
+
 
 //preloader
 const loader= document.querySelector('.loader')
