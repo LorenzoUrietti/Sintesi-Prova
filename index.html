@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Display a map on a webpage</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; background-color: black;}
+#map { position: absolute; top: 10vh; bottom: 0; width: 100%; }
+button{ text-decoration: none; padding:10px 20px 10px 20px; border-radius: 30px; border:none}
+
+.loader{position:fixed; top:0; left:0; height:100%; width:100%; display:flex; justify-content: center; align-items: center; z-index: 50;}
+.disappear{animation: vanish 1s forwards;}
+@keyframes vanish{
+  100%{
+    opacity:0; 
+    visibility:hidden;
+  }
+}
+
+</style>
+</head>
+
+<div class="loader">
+  <img src='36.png'></img>
+</div>
+
+<body onload='intro()'>
+    <h1 style='position:absolute; z-index:20; top:20px; left:50px; color: blue;'>PUNKISSIMO</h1>
+    <div id='footer' style='position: absolute; bottom:0%; width:100%; height:5vh; background-color: black; z-index:10'></div>
+    <button id='fs' onclick='neoFullscreenUnico()' style='position:absolute; bottom:20px; left:10px; z-index: 50; background-color: blue;'><p style='color:white'>FUllscreen</p></button>
+<div id="map"></div>
+<script>
+
+
+	mapboxgl.accessToken = 'pk.eyJ1Ijoia3ViYWJsYXN6Y3p5a293c2tpIiwiYSI6ImNrdjZxaGowbTJ6eWQzMXF3b3k2bHlraDgifQ.ww6jGZYsy5Vo12LGx8VTqA';
+
+    const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style:'mapbox://styles/kubablaszczykowski/ckvh5rhim3qux14l246uaw4gr', // style URL
+        center: [9.18, 45.449], // starting position [lng, lat]
+        zoom: 11, // starting zoom
+        antialias: true,
+
+    });
+
+
+    // vecchio full screen
+    // map.addControl(new mapboxgl.FullscreenControl(), );
+
+    // nuovo full screen
+
+  var elem = document.documentElement;
+  let stato =0;
+
+function neoFullscreenUnico(){
+    if(stato===0){
+        stato++;
+        if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+    } else if (stato===1){
+        stato--;
+        if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) { /* Safari */
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { /* IE11 */
+    document.msExitFullscreen();
+  }
+    }
+}
+ 
+
+// evento iniziale
+function intro(){
+    map.flyTo({
+      center: map.center,
+      zoom: 15.5,
+      bearing: 0,
+    // These options control the flight curve, making it move
+    // slowly and zoom out almost completely before starting to pan.
+      speed: 0.9, // make the flying slow
+      curve: 1, // change the speed at which it zooms out
+    // This can be any easing function: it takes a number between
+    // 0 and 1 and returns another number between 0 and 1.
+      easing: (t) => t, 
+    // this animation is considered essential with respect to prefers-reduced-motion
+      essential: true
+    });
+}
+
+    map.setMinZoom(11);
+    map.setMaxZoom(18);
+
+    map.setMaxPitch(40);
+    map.setMinPitch(40);
+  
+
+//preloader
+const loader= document.querySelector('.loader')
+window.addEventListener('load', vanish)
+function vanish(){
+  loader.classList.add('disappear')
+}
+
+
+
+
+</script>
+
+</body>
+</html>
