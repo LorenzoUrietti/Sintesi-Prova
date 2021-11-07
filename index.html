@@ -2,75 +2,376 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Display a map on a webpage</title>
+<title>prova</title>
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
 <style>
 body { margin: 0; padding: 0; background-color: black;}
-#map { position: absolute; top: 10vh; bottom: 0; width: 100%; }
-button{ text-decoration: none; padding:10px 20px 10px 20px; border-radius: 30px; border:none}
 
-.loader{position:fixed; top:0; left:0; height:100%; width:100%; display:flex; justify-content: center; align-items: center; z-index: 50;}
-.disappear{animation: vanish 1s forwards;}
-@keyframes vanish{
-  100%{
-    opacity:0; 
-    visibility:hidden;
-  }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; z-index:-10;}
+
+button{ text-decoration: none; padding:10px 20px 10px 20px; border-radius: 30px; border:none; transition: 0.3s; cursor: pointer;}
+button:hover{transform: scale(1.1)} 
+
+.marker {
+display: block;
+border: none;
+border-radius: 0%;
+cursor: pointer;
+padding: 0;
+z-index: 5;
+}
+.marker:hover{
+  transform:scale(1.1)
 }
 
+.pop{position:fixed; top:0%; right:0%; height:100%; width:40%;  text-align:center; padding-top: 10%;z-index: 10;}
+#popup0{background: blue;}
+#popup1{background: white;}
+#popup2{background: red;}
 
-.mapboxgl-popup {
-  max-width: 200px;
+.pop p{font-size: 30px;}
+.show{animation: showw 0.8s forwards;}
+.hide{animation: disappear 0.6s forwards;}
+.hidenow{display:none}
+
+@keyframes showw {
+ 0% {right:-100%;}
+ 100% {opacity: 1;} 
 }
-
-.mapboxgl-popup-content {
-  text-align: center;
-  font-family: 'Open Sans', sans-serif;
+@keyframes disappear {
+  0% {opacity: 1;}
+  100% {right:-100%; display: none;}
 }
 
 
 </style>
 </head>
 
-<div class="loader">
-  <img src='36.png'></img>
-</div>
 
 <body onload='intro()'>
     <h1 style='position:absolute; z-index:20; top:20px; left:50px; color: blue;'>PUNKISSIMO</h1>
-    <div id='footer' style='position: absolute; bottom:0%; width:100%; height:8vh; background-color: black; z-index:10'></div>
+    <div id='footer' style='position: absolute; bottom:0%; width:100%; height:8vh; background-color: black; z-index:11'></div>
     <button id='fs' onclick='neoFullscreenUnico()' style='position:absolute; bottom:20px; left:10px; z-index: 50; background-color: blue; color: white'>FUllscreen</button>
-    <button id='fw' onclick='movefw()' style='position:absolute; z-index:20; bottom:20px; right:50px; background-color: blue; color:white'>	&#8594</button>
+    <button id='fw' onclick='movefw()' style='position:absolute; z-index:20; bottom:20px; right:50px; background-color: red; color:white'>	&#8594 </button>
     <button id='bw' onclick='movebw()'style='position:absolute; z-index:20; bottom:20px; right:110px; background-color: blue; color:white'>	&#8592</button>
+
+    <!--contenuto dei popupponi-->
+        <div class='hide hidenow pop' id='popup0'>
+          <p>Soy el popup 0</p>
+          <button onclick='close0()'>Close</button>
+        </div>
+
+        <div class='hide hidenow pop' id='popup1'>
+          <p>So er popup 1</p>
+          <button onclick='close1()'>Close</button>
+        </div>
+
+        <div class='hide hidenow pop' id='popup2'>
+          <p>Je suis le popup 2</p>
+          <button onclick='close2()'>Close</button>
+        </div>
 <div id="map"></div>
+
 <script>
-
-
 	mapboxgl.accessToken = 'pk.eyJ1Ijoia3ViYWJsYXN6Y3p5a293c2tpIiwiYSI6ImNrdjZxaGowbTJ6eWQzMXF3b3k2bHlraDgifQ.ww6jGZYsy5Vo12LGx8VTqA';
-
+// mappa
   const map = new mapboxgl.Map({
         container: 'map', // container ID
         style:'mapbox://styles/kubablaszczykowski/ckvh5rhim3qux14l246uaw4gr', // style URL
-        center: [9.18, 45.449], // starting position [lng, lat]
+        center: [9.18, 45.441], // starting position [lng, lat]
+        interactive: true,
         zoom: 13, // starting zoom
         antialias: true,
-
     });
 
 
-    // vecchio full screen
-    // map.addControl(new mapboxgl.FullscreenControl(), );
+
+    
+// evento iniziale
+function intro(){
+    map.flyTo({
+      center: map.center,
+      zoom: 16,
+      bearing: 0,
+      speed: 0.3, 
+      essential: true
+    });
+}
+
+
+  let i=0;
+// stato dei posti per funzioni pop, close 
+  let stato0 = 0;
+  let stato1 = 0;
+  let stato2 = 0;
+// definizione dei posti
+  const geojson = {
+    'type': 'FeatureCollection',
+    'features': [
+      {
+        'type': 'Posto_a',
+        'state': 0,
+        'properties': {
+          'iconSize': [41, 60]
+        },
+        'geometry': {
+          'type': 'Point',
+          'coordinates': [9.175, 45.44]
+        }
+      },
+      {
+        'type': 'Posto_b',
+        'state': 1,
+        'properties': {
+          'iconSize': [41, 60]
+        },
+        'geometry': {
+          'type': 'Point',
+          'coordinates': [9.179, 45.44]
+        }
+      },
+      {
+        'type': 'Posto_c',
+        'state': 2,
+        'properties': {
+          'iconSize': [41, 60]
+        },
+        'geometry': {
+          'type': 'Point',
+          'coordinates': [9.183, 45.44]
+        }
+      },
+    ]
+  };
+// Add markers to the map.
+  for (const marker of geojson.features) {
+// Create a DOM element for each marker.
+  const el = document.createElement('div');
+  const width = marker.properties.iconSize[0];
+  const height = marker.properties.iconSize[1];
+    el.className = 'marker';
+    el.style.backgroundImage = `url('pointer.png')`;
+    el.style.width = `${width}px`;
+    el.style.height = `${height}px`;
+    el.style.backgroundSize = '100%';
+// Funzione al click dei marker
+    el.addEventListener('click', () => {
+      map.flyTo({
+        center: marker.geometry.coordinates, 
+        essential: true,
+        speed:1.2,
+        zoom: 16.5,
+      });
+      if (marker.geometry.coordinates == geojson.features[0].geometry.coordinates){
+        i=0;
+      } else if (marker.geometry.coordinates == geojson.features[1].geometry.coordinates){
+        i=1;
+      } else if (marker.geometry.coordinates == geojson.features[2].geometry.coordinates){
+        i=2;
+      }
+      if (i==0) {funzionepop0(); close1(); stato1 = 0; close2(); stato2 = 0;}
+      else if (i==1) {funzionepop1(); close0(); stato0 = 0; close2(); stato2 = 0;}
+      else if (i==2) {funzionepop2(); close0(); stato0 = 0; close1(); stato1 = 0;}
+      });
+// Add markers to the map.
+  new mapboxgl.Marker(el)
+    .setLngLat(marker.geometry.coordinates)
+    .addTo(map);
+  }
+
+// ogni funzione apre il popup di un posto divesrso
+  function funzionepop0() {
+    let popup = document.getElementById("popup0");
+    if(stato0===0){
+      popup.classList.remove('hidenow')
+      popup.classList.remove('hide');
+      popup.classList.add("show");
+      stato0++;
+    } else if (stato0===1){
+      popup.classList.remove('show');
+      popup.classList.add('hide');
+      stato0--;
+    } 
+  }
+  function funzionepop1() {
+    let popup = document.getElementById("popup1");
+    if(stato1===0){
+      popup.classList.remove('hidenow')
+      popup.classList.remove('hide');
+      popup.classList.add("show");
+      stato1++;
+    } else if (stato1===1){
+      popup.classList.remove('show');
+      popup.classList.add('hide');
+      stato1--;
+    } 
+  }
+  function funzionepop2() {
+    let popup = document.getElementById("popup2");
+    if(stato2===0){
+      popup.classList.remove('hidenow')
+      popup.classList.remove('hide');
+      popup.classList.add("show");
+      stato2++;
+    } else if (stato2===1){
+      popup.classList.remove('show');
+      popup.classList.add('hide');
+      stato2--;
+    } 
+  }
+
+// specifiche per chiudere i popup
+  function close0() {
+    let popup = document.getElementById("popup0");
+    popup.classList.remove('show');
+    popup.classList.add('hide');
+  }
+  function close1() {
+    let popup = document.getElementById("popup1");
+    popup.classList.remove('show');
+    popup.classList.add('hide');
+  }
+  function close2() {
+    let popup = document.getElementById("popup2");
+    popup.classList.remove('show');
+    popup.classList.add('hide');
+  }
+
+//funzione frecce
+function movefw(){
+  const markerLngLat = geojson.features[i].geometry.coordinates;
+  switch(i){
+    case 0:
+      map.flyTo({
+        center: markerLngLat, 
+        essential: true,
+        speed:0.4,
+        zoom: 16.5,
+      });
+      close2();
+      close0();
+      close1();
+      funzionepop0();
+      stato0=0;
+      i++;
+    break;
+    case 1:
+      map.flyTo({
+        center: markerLngLat, 
+        essential: true,
+        speed:0.4,
+        zoom: 16.5,
+      });
+      close0();
+      close1();
+      close2();
+      funzionepop1();
+      stato1=0;
+      i++;
+    break;
+    case 2:
+      map.flyTo({
+        center: markerLngLat,
+        essential: true,
+        speed:0.4,
+        zoom: 16.5,
+      });
+      close1();
+      close2();
+      close0();
+      funzionepop2();
+      stato2=0;
+      i=0;
+    break;
+    default:
+      map.flyTo({
+        center:map.center,
+        zoom: 10.5,
+        essential: true,
+      })
+  }
+}
+function movebw(){
+  const markerState= geojson.features[i].state;
+  const markerLngLat = geojson.features[i].geometry.coordinates;
+  switch(i){
+    case 0:
+      map.flyTo({
+        center: markerLngLat, 
+        essential: true,
+        speed:0.4,
+        zoom: 16.5,
+      });
+      funzionepop0();
+      close1();
+      close2();
+      stato0=0;
+      i=2;
+    break;
+    case 2:
+      map.flyTo({
+        center: markerLngLat, 
+        essential: true,
+        speed:0.4,
+        zoom: 16.5,
+      });
+      funzionepop2();
+      close0();
+      close1();
+      stato2=0;
+      i--;
+    break;
+    case 1:
+      map.flyTo({
+        center: markerLngLat,
+        essential: true,
+        speed:0.4,
+        zoom: 16.5,
+      });
+      funzionepop1();
+      close2();
+      stato1=0;
+      i--;
+    break;
+    default:
+      map.flyTo({
+        center:map.center,
+        zoom: 10.5,
+        essential: true,
+      });
+  }
+}
+
+//funzioni attivate con tastiera(frecce + fullscreen)
+var addEvent = document.addEventListener ? function(target,type,action){
+    if(target){
+        target.addEventListener(type,action,false);
+    }
+} : function(target,type,action){
+    if(target){
+        target.attachEvent('on' + type,action,false);
+    }
+  }
+addEvent(document,'keydown',function(e){
+    e = e || window.event;
+    var key = e.which || e.keyCode;
+    if(key===39){
+        movefw()
+    } else if(key===37){
+        movebw()
+    } else if (key===70){
+        neoFullscreenUnico()
+    }
+});
 
 // nuovo full screen
-
 var elem = document.documentElement;
-let stato =0;
-
+let statoFullscreen=0;
 function neoFullscreenUnico(){
-    if(stato===0){
-        stato++;
+    if(statoFullscreen===0){
+        statoFullscreen++;
         if (elem.requestFullscreen) {
     elem.requestFullscreen();
   } else if (elem.webkitRequestFullscreen) { /* Safari */
@@ -78,8 +379,8 @@ function neoFullscreenUnico(){
   } else if (elem.msRequestFullscreen) { /* IE11 */
     elem.msRequestFullscreen();
   }
-    } else if (stato===1){
-        stato--;
+    } else if (statoFullscreen===1){
+        statoFullscreen--;
         if (document.exitFullscreen) {
     document.exitFullscreen();
   } else if (document.webkitExitFullscreen) { /* Safari */
@@ -89,136 +390,9 @@ function neoFullscreenUnico(){
   }
     }
 }
- 
-// evento iniziale
-function intro(){
-    map.flyTo({
-      center: map.center,
-      zoom: 16,
-      bearing: 0,
-    // These options control the flight curve, making it move
-    // slowly and zoom out almost completely before starting to pan.
-      speed: 0.3, // make the flying slow
-    // this animation is considered essential with respect to prefers-reduced-motion
-      essential: true
-    });
-}
 
-    map.setMinZoom(11);
-    map.setMaxZoom(18);
-
-    map.setMaxPitch(40);
-    map.setMinPitch(40);
-  
-
-  //a, b, c, ... sono le coordinate dei centri dei luoghi di interesse
-
-const marker_a = new mapboxgl.Marker()
-  .setLngLat([9.183, 45.448])
-  .addTo(map)
-  .setPopup(new mapboxgl.Popup().setHTML("<a target='blank' href='https://www.youtube.com/watch?v=hio-rQxx9Vg&ab_channel=AlessandroBarbero-LaStoriasiamoNoi'><h1>Hello World!</h1></a>"));
-
-const a = marker_a.getLngLat();
-
-const marker_b = new mapboxgl.Marker()
-  .setLngLat([9.179, 45.446])
-  .addTo(map)
-  .setPopup(new mapboxgl.Popup().setHTML("<a target='blank' href='https://www.youtube.com/watch?v=-9PpDzV454M&ab_channel=ChicanoBatmanVEVO'><h1>Hello World!</h1></a>"));
-const b = marker_b.getLngLat();
-
-const marker_c = new mapboxgl.Marker()
-  .setLngLat([9.181, 45.4494])
-  .addTo(map)
-  .setPopup(new mapboxgl.Popup().setHTML("<a target='blank' href='https://www.youtube.com/watch?v=MLMRHScRnhs&t=24s&ab_channel=ZoomA%21%E3%82%BA%E3%83%BC%E3%83%9E%21'><h1>Hello World!</h1></a>"));
-const c = marker_c.getLngLat();
-
-
-//funzione frecce
-let statop = 0;
-function movefw(){
-  switch(statop){
-    case 0:
-      map.flyTo({
-        center: a, 
-        essential: true,
-        speed:0.4,
-        zoom: 16.5,
-      });
-      statop++;
-    break;
-    case 1:
-      map.flyTo({
-        center: b, 
-        essential: true,
-        speed:0.4,
-        zoom: 16.5,
-      });
-      statop++;
-    break;
-    case 2:
-      map.flyTo({
-        center: c,
-        essential: true,
-        speed:0.4,
-        zoom: 16.5,
-      })
-      statop=0;
-    break;
-    default:
-      map.flyTo({
-        center:map.center,
-        zoom: 15.5,
-        essential: true,
-      })
-  }
-}
-function movebw(){
-  switch(statop){
-    case 0:
-      map.flyTo({
-        center: c, 
-        essential: true,
-        speed:0.4,
-        zoom: 16.5,
-      });
-      statop=2;
-    break;
-    case 2:
-      map.flyTo({
-        center: b, 
-        essential: true,
-        speed:0.4,
-        zoom: 16.5,
-      });
-      statop--;
-    break;
-    case 1:
-      map.flyTo({
-        center: a,
-        essential: true,
-        speed:0.4,
-        zoom: 16.5,
-      })
-      statop--;
-    break;
-    default:
-      map.flyTo({
-        center:map.center,
-        zoom: 15.5,
-        essential: true,
-      })
-  }
-}
-
-//preloader
-const loader= document.querySelector('.loader')
-window.addEventListener('load', vanish)
-function vanish(){
-  loader.classList.add('disappear')
-}
-
-
-
+map.setMaxPitch(70);
+map.setMinPitch(70);
 
 </script>
 
