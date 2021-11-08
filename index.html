@@ -7,6 +7,29 @@
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
 <style>
+  * {box-sizing:border-box}
+
+  /* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: black;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: blue;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-track:hover {
+  background: white;
+}
+
 body { margin: 0; padding: 0; background-color: black;}
 
 #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index:-10;}
@@ -26,7 +49,9 @@ z-index: 5;
   transform:scale(1.1)
 }
 
-.pop{position:fixed; top:0%; right:0%; height:100%; width:40%;  text-align:center; padding-top: 10%;z-index: 10;}
+.pop{position:fixed; top:0%; right:0%; height:100%; width:40%; bottom:0%; text-align:center; padding-top: 8vh;z-index: 10;}
+
+
 #popup0{background: blue;}
 #popup1{background: white;}
 #popup2{background: red;}
@@ -35,6 +60,9 @@ z-index: 5;
 .show{animation: showw 0.8s forwards;}
 .hide{animation: disappear 0.6s forwards;}
 .hidenow{display:none}
+
+.showl{animation: showwl 0.8s forwards;}
+.hidel{animation: disappearl 0.6s forwards; }
 
 @keyframes showw {
  0% {right:-100%;}
@@ -45,12 +73,28 @@ z-index: 5;
   100% {right:-100%; display: none;}
 }
 
+@keyframes showwl {
+ 0% {bottom:-100%; opacity:0;}
+ 100% {opacity: 1; bottom:8vh;} 
+}
+@keyframes disappearl {
+  0% {opacity: 1; bottom:8vh;}
+  100% {bottom:-100%; opacity: 0;}
+}
+
 #mobile{display: none; background: blue; padding: 30 30 30 30;}
 
 @media only screen and(max-width:768px) {
   #desktop{display: none;};
   #mobile{display: block;}
 }
+
+.epl{position:fixed; right:0%; height:60%; width:40%; bottom:0%; text-align:center; padding-top: 0vh;z-index: 10;}
+#epList{background: black; overflow: auto; padding:0px 10px 0px 10px;}
+#fixednav{position: sticky; background: black; z-index:1; display: block; width:100%; top:0%; padding: 20px 0px 20px 0px; margin-top: 0px;}
+.ep_container{position:relative; height:25%; width:100%; background: white; margin-top: 10px;}
+.ep_container .imgl {position: absolute; display: inline-block; left:0%; height:100%; width: 30%; background: blue;}
+.exit {background: red;}
 
 </style>
 </head>
@@ -63,6 +107,7 @@ z-index: 5;
     <button id='fs' onclick='neoFullscreenUnico()' style='position:absolute; bottom:20px; left:10px; z-index: 50; background-color: blue; color: white'>FUllscreen</button>
     <button id='fw' onclick='movefw()' style='position:absolute; z-index:50; bottom:20px; right:50px; background-color: blue; color:white'>	&#8594 </button>
     <button id='bw' onclick='movebw()'style='position:absolute; z-index:50; bottom:20px; right:110px; background-color: blue; color:white'>	&#8592</button>
+    <button id='epLists' onclick='showList()'style='position:absolute; z-index:50; bottom:20px; right:450px; background-color: blue; color:white'>Episodi</button>
 
     <!--contenuto dei popupponi-->
         <div class='hide hidenow pop' id='popup0'>
@@ -78,6 +123,33 @@ z-index: 5;
         <div class='hide hidenow pop' id='popup2'>
           <p>Je suis le popup 2</p>
           <button onclick='close2()'>Close</button>
+        </div>
+      <!--lista episodi-->
+        <div class='hidel hidenow epl' id='epList'>
+          <div id='fixednav'>
+            <p style='color:white; display: inline-block;'>Je suis le navbar</p>
+            <button onclick='closeEpList()'>Close</button>
+          </div>
+          <!--singoli episodi container-->
+          <div class='ep_container'>
+            <div class='imgl'>
+              <h1>1</h1>
+              <button onclick=''>Locate</button>
+            </div>
+            <button class='exit'><a target='blank' href='https://www.youtube.com/watch?v=bNO-XQw0LCQ&ab_channel=Cherdleys'>watch now</a></button>
+          </div>
+          <div class='ep_container'>
+            <div class='imgl'><h1>2</h1></div>
+            <button class='exit'><a target='blank' href='https://www.youtube.com/watch?v=bNO-XQw0LCQ&ab_channel=Cherdleys'>watch now</a></button>
+          </div>
+          <div class='ep_container'>
+            <div class='imgl'><h1>3</h1></div>
+            <button class='exit'><a target='blank' href='https://www.youtube.com/watch?v=bNO-XQw0LCQ&ab_channel=Cherdleys'>watch now</a></button>
+          </div>
+          <div class='ep_container'>
+            <div class='imgl'><h1>4</h1></div>
+            <button class='exit'><a target='blank' href='https://www.youtube.com/watch?v=bNO-XQw0LCQ&ab_channel=Cherdleys'>watch now</a></button>
+          </div>
         </div>
     <div id="map"></div>
   </div>
@@ -114,6 +186,8 @@ function intro(){
   let stato0 = 0;
   let stato1 = 0;
   let stato2 = 0;
+// stato della lista episodi
+  let statol = 0;
 // definizione dei posti
   const geojson = {
     'type': 'FeatureCollection',
@@ -215,16 +289,32 @@ function intro(){
     } 
   }
   function funzionepop2() {
-    let popup = document.getElementById("popup2");
+    let popupl = document.getElementById("popup2");
     if(stato2===0){
-      popup.classList.remove('hidenow')
-      popup.classList.remove('hide');
-      popup.classList.add("show");
+      popupl.classList.remove('hidenow')
+      popupl.classList.remove('hide');
+      popupl.classList.add("show");
       stato2++;
     } else if (stato2===1){
-      popup.classList.remove('show');
-      popup.classList.add('hide');
+      popupl.classList.remove('show');
+      popupl.classList.add('hide');
       stato2--;
+    } 
+  }
+
+  // funzione per lista episodi
+  function showList() {   
+    console.log('statol è ' + statol)
+    let popup = document.getElementById("epList");
+    if(statol==0){
+      popup.classList.remove('hidenow')
+      popup.classList.remove('hidel');
+      popup.classList.add('showl');
+      statol++;
+    } else if (statol==1){
+      popup.classList.remove('showl');
+      popup.classList.add('hidel');
+      statol--;
     } 
   }
 
@@ -248,6 +338,13 @@ function intro(){
     stato2=0;
   }
 
+  function closeEpList() {
+    let popupl = document.getElementById("epList");
+    popupl.classList.remove('showl');
+    popupl.classList.add('hidel');
+    statol=0;
+  }
+
 //funzione frecce
 function movefw(){
   const markerLngLat = geojson.features[i].geometry.coordinates;
@@ -256,7 +353,7 @@ function movefw(){
       map.flyTo({
         center: markerLngLat, 
         essential: true,
-        speed:0.4,
+        speed:0.6,
         zoom: 16.5,
       });
       close2();
@@ -271,7 +368,7 @@ function movefw(){
       map.flyTo({
         center: markerLngLat, 
         essential: true,
-        speed:0.4,
+        speed:0.6,
         zoom: 16.5,
       });
       close0();
@@ -286,7 +383,7 @@ function movefw(){
       map.flyTo({
         center: markerLngLat,
         essential: true,
-        speed:0.4,
+        speed:0.6,
         zoom: 16.5,
       });
       close1();
@@ -315,7 +412,7 @@ function movebw(){
       map.flyTo({
         center: geojson.features[1].geometry.coordinates, 
         essential: true,
-        speed:0.4,
+        speed:0.6,
         zoom: 16.5,
       });
       close0();
@@ -330,7 +427,7 @@ function movebw(){
       map.flyTo({
         center: geojson.features[0].geometry.coordinates, 
         essential: true,
-        speed:0.4,
+        speed:0.6,
         zoom: 16.5,
       });
       close2();
@@ -345,7 +442,7 @@ function movebw(){
       map.flyTo({
         center: geojson.features[2].geometry.coordinates,
         essential: true,
-        speed:0.4,
+        speed:0.6,
         zoom: 16.5,
       });  
       close0();
@@ -389,7 +486,7 @@ addEvent(document,'keydown',function(e){
     }
 });
 
-// nuovo full screen
+// full screen
 var elem = document.documentElement;
 let statoFullscreen=0;
 function neoFullscreenUnico(){
