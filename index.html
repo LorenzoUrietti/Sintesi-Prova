@@ -241,7 +241,7 @@ function intro(){
   // Funzione al click dei marker
       el.addEventListener('click', () => {
         map.flyTo({
-          center: marker.geometry.coordinates, 
+          center: [marker.geometry.coordinates[0]+0.0028, marker.geometry.coordinates[1]], 
           essential: true,
           speed:1.2,
           zoom: 16.5,
@@ -351,7 +351,7 @@ function movefw(){
   switch(i){
     case 0:
       map.flyTo({
-        center: markerLngLat, 
+        center: [markerLngLat[0]+0.0028, markerLngLat[1]], 
         essential: true,
         speed:0.6,
         zoom: 16.5,
@@ -366,7 +366,7 @@ function movefw(){
     break;
     case 1:
       map.flyTo({
-        center: markerLngLat, 
+        center: [markerLngLat[0]+0.0028, markerLngLat[1]], 
         essential: true,
         speed:0.6,
         zoom: 16.5,
@@ -381,7 +381,7 @@ function movefw(){
     break;
     case 2:
       map.flyTo({
-        center: markerLngLat,
+        center: [markerLngLat[0]+0.0028, markerLngLat[1]],
         essential: true,
         speed:0.6,
         zoom: 16.5,
@@ -410,7 +410,7 @@ function movebw(){
   switch(i){
     case 0:
       map.flyTo({
-        center: geojson.features[1].geometry.coordinates, 
+        center: [geojson.features[1].geometry.coordinates[0]+0.0028, geojson.features[1].geometry.coordinates[1]],
         essential: true,
         speed:0.6,
         zoom: 16.5,
@@ -425,7 +425,7 @@ function movebw(){
     break;
     case 2:
       map.flyTo({
-        center: geojson.features[0].geometry.coordinates, 
+        center: [geojson.features[0].geometry.coordinates[0]+0.0028, geojson.features[0].geometry.coordinates[1]], 
         essential: true,
         speed:0.6,
         zoom: 16.5,
@@ -440,7 +440,7 @@ function movebw(){
     break;
     case 1:
       map.flyTo({
-        center: geojson.features[2].geometry.coordinates,
+        center: [geojson.features[2].geometry.coordinates[0]+0.0028, geojson.features[2].geometry.coordinates[1]],
         essential: true,
         speed:0.6,
         zoom: 16.5,
