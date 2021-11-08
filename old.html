@@ -136,13 +136,10 @@ const c = marker_c.getLngLat();
 
 
 //funzione frecce
-let statop = Math.round(Math.random()*10);
+let statop = 0;
 function movefw(){
   switch(statop){
     case 0:
-    case 3:
-    case 6:
-    case 9:
       map.flyTo({
         center: a, 
         essential: true,
@@ -150,11 +147,10 @@ function movefw(){
         zoom: 16.5,
       });
       statop++;
+      console.log(statop)
     break;
     case 1:
-    case 4:
-    case 7:
-    case 10:
+
       map.flyTo({
         center: b, 
         essential: true,
@@ -162,10 +158,10 @@ function movefw(){
         zoom: 16.5,
       });
       statop++;
+      console.log(statop)
     break;
     case 2:
-    case 5:
-    case 8:
+
       map.flyTo({
         center: c,
         essential: true,
@@ -173,6 +169,7 @@ function movefw(){
         zoom: 16.5,
       })
       statop=0;
+      console.log(statop)
     break;
     default:
       map.flyTo({
@@ -180,29 +177,32 @@ function movefw(){
         zoom: 15.5,
         essential: true,
       })
+      console.log(statop)
   }
 }
 function movebw(){
   switch(statop){
-    case 0:
+    case 1:
       map.flyTo({
         center: c, 
         essential: true,
         speed:0.4,
         zoom: 16.5,
       });
-      statop=2;
+      statop--;
+      console.log(statop)
     break;
-    case 2:
+    case 0:
       map.flyTo({
         center: b, 
         essential: true,
         speed:0.4,
         zoom: 16.5,
       });
-      statop--;
+      statop=2;
+      console.log(statop)
     break;
-    case 1:
+    case 2:
       map.flyTo({
         center: a,
         essential: true,
@@ -210,6 +210,7 @@ function movebw(){
         zoom: 16.5,
       })
       statop--;
+      console.log(statop)
     break;
     default:
       map.flyTo({
@@ -217,6 +218,7 @@ function movebw(){
         zoom: 15.5,
         essential: true,
       })
+      console.log(statop)
   }
 }
 
